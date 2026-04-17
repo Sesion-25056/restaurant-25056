@@ -14,10 +14,10 @@ export default function Menu() {
       img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?q=80&w=2070&auto=format&fit=crop"
     },
     {
-      name: "Esfera de Eclipse",
+      name: "Tallarines a la Alfredo",
       price: "$28",
       description: "Cúpula de chocolate oscuro, detalles en pan de oro, centro de caramelo salado y humo de vainilla de Madagascar.",
-      img: "https://images.unsplash.com/photo-1511381939415-e440c061aa01?q=80&w=1934&auto=format&fit=crop"
+      img: "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     }
   ];
 
