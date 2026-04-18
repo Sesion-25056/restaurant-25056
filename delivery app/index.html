@@ -1,13 +1,417 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>delivery-app</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaborExpress - Delivery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --primario: #E63946;
+            --primario-oscuro: #c1121f;
+            --secundario: #FF6B35;
+            --naranja: #FF9F1C;
+            --oscuro: #111111;
+            --gris: #6B7280;
+            --gris-claro: #F3F4F6;
+            --blanco: #FFFFFF;
+            --sombra: 0 4px 20px rgba(0,0,0,0.08);
+            --sombra-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --transicion: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Poppins', sans-serif; background: var(--blanco); color: var(--oscuro); overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: var(--primario); border-radius: 4px; }
+
+        /* NAVBAR */
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1.2rem 0; transition: var(--transicion); }
+        .navbar.scrolled { background: rgba(255,255,255,0.97); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0,0,0,0.06); padding: 0.8rem 0; }
+        .nav-container { max-width: 1300px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { font-size: 1.6rem; font-weight: 800; color: white; cursor: pointer; text-decoration: none; }
+        .navbar.scrolled .nav-logo { color: var(--oscuro); }
+        .nav-logo span { color: var(--naranja); }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-link { color: rgba(255,255,255,0.9); text-decoration: none; font-weight: 500; cursor: pointer; transition: var(--transicion); }
+        .nav-link:hover { color: var(--naranja); }
+        .navbar.scrolled .nav-link { color: var(--oscuro); }
+        .nav-actions { display: flex; align-items: center; gap: 1.5rem; }
+        .cart-btn { position: relative; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .navbar.scrolled .cart-btn { color: var(--oscuro); }
+        .cart-count { position: absolute; top: -8px; right: -10px; background: var(--secundario); color: white; font-size: 0.65rem; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .nav-order-btn { background: var(--primario); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 50px; font-weight: 600; cursor: pointer; transition: var(--transicion); font-family: 'Poppins', sans-serif; }
+        .nav-order-btn:hover { background: var(--primario-oscuro); transform: translateY(-2px); }
+
+        /* HERO */
+        .hero { min-height: 100vh; display: flex; align-items: center; background: linear-gradient(135deg, var(--oscuro) 0%, #2b0a0e 100%); position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 800px; height: 800px; background: radial-gradient(circle, rgba(255,107,53,0.15) 0%, transparent 70%); border-radius: 50%; }
+        .hero-container { max-width: 1300px; margin: 0 auto; padding: 8rem 2rem 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; position: relative; z-index: 1; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,159,28,0.15); border: 1px solid rgba(255,159,28,0.3); color: var(--naranja); padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; }
+        .hero-title { font-size: 3.8rem; font-weight: 900; color: white; line-height: 1.1; margin-bottom: 1.5rem; }
+        .hero-title .highlight { color: var(--naranja); }
+        .hero-desc { color: rgba(255,255,255,0.65); font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem; max-width: 480px; }
+        .hero-btns { display: flex; gap: 1rem; margin-bottom: 3rem; }
+        .btn-primary { background: var(--primario); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: var(--transicion); font-family: 'Poppins', sans-serif; }
+        .btn-primary:hover { background: var(--primario-oscuro); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(230,57,70,0.3); }
+        .btn-outline { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.2); padding: 0.95rem 2rem; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: var(--transicion); font-family: 'Poppins', sans-serif; }
+        .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.05); }
+        .hero-stats { display: flex; gap: 3rem; }
+        .stat h3 { font-size: 2rem; font-weight: 800; color: white; }
+        .stat h3 span { color: var(--naranja); }
+        .stat p { color: rgba(255,255,255,0.5); font-size: 0.85rem; }
+
+        .hero-visual { position: relative; display: flex; justify-content: center; align-items: center; }
+        .hero-img-circle { width: 420px; height: 420px; border-radius: 50%; border: 5px solid rgba(255,255,255,0.05); background: radial-gradient(circle, rgba(230,57,70,0.2) 0%, transparent 70%); display: flex; align-items: center; justify-content: center; font-size: 10rem; }
+        .float-card { position: absolute; background: white; border-radius: 16px; padding: 1rem 1.2rem; box-shadow: var(--sombra-lg); display: flex; align-items: center; gap: 0.8rem; }
+        .float-card.top-right { top: 40px; right: 0; animation: float 3s ease-in-out infinite; }
+        .float-card.bottom-left { bottom: 60px; left: 0; animation: float 3s ease-in-out infinite 1.5s; }
+        .float-icon { font-size: 2rem; }
+        .float-text h4 { font-size: 0.9rem; font-weight: 700; color: var(--oscuro); }
+        .float-text p { font-size: 0.75rem; color: var(--gris); }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* SECCIONES */
+        .section { padding: 6rem 2rem; }
+        .section-container { max-width: 1300px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-sub { color: var(--primario); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .section-title { font-size: 2.8rem; font-weight: 800; color: var(--oscuro); line-height: 1.2; }
+        .section-desc { color: var(--gris); font-size: 1.05rem; max-width: 600px; margin: 1rem auto 0; line-height: 1.7; }
+
+        /* CATEGORIAS */
+        .categories-section { background: var(--gris-claro); }
+        .categories-grid { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .category-card { background: white; border-radius: 20px; padding: 2rem 1.5rem; text-align: center; width: 140px; cursor: pointer; transition: var(--transicion); border: 2px solid transparent; }
+        .category-card:hover { border-color: var(--primario); transform: translateY(-5px); box-shadow: var(--sombra); }
+        .category-card.active { border-color: var(--primario); background: #FFF0F0; }
+        .category-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+        .category-name { font-weight: 600; font-size: 0.9rem; color: var(--oscuro); }
+
+        /* MENU */
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+        .menu-card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #eee; transition: var(--transicion); }
+        .menu-card:hover { transform: translateY(-5px); box-shadow: var(--sombra-lg); }
+        .menu-img { height: 200px; display: flex; align-items: center; justify-content: center; font-size: 5rem; position: relative; }
+        .menu-tag { position: absolute; top: 15px; left: 15px; background: var(--primario); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .menu-info { padding: 1.5rem; }
+        .menu-info-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .menu-name { font-size: 1.1rem; font-weight: 700; color: var(--oscuro); }
+        .menu-price { font-size: 1.2rem; font-weight: 800; color: var(--primario); white-space: nowrap; }
+        .menu-desc { color: var(--gris); font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.5; }
+        .menu-meta { display: flex; justify-content: space-between; align-items: center; }
+        .menu-rating { display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; color: var(--naranja); font-weight: 600; }
+        .menu-rating span { color: var(--gris); font-weight: 400; }
+        .menu-time { font-size: 0.85rem; color: var(--gris); }
+        .add-btn { width: 100%; margin-top: 1rem; padding: 0.8rem; background: var(--gris-claro); color: var(--oscuro); border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: var(--transicion); font-family: 'Poppins', sans-serif; font-size: 0.9rem; }
+        .add-btn:hover { background: var(--primario); color: white; }
+
+        /* PROMO */
+        .promo-section { background: linear-gradient(135deg, var(--primario) 0%, var(--secundario) 100%); border-radius: 30px; padding: 4rem; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; margin: -3rem 0; }
+        .promo-content { position: relative; z-index: 2; max-width: 600px; }
+        .promo-content h2 { font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 1rem; }
+        .promo-content p { color: rgba(255,255,255,0.85); font-size: 1.1rem; margin-bottom: 2rem; }
+        .promo-code { display: inline-block; background: rgba(255,255,255,0.2); border: 2px dashed rgba(255,255,255,0.5); padding: 0.8rem 1.5rem; border-radius: 10px; color: white; font-weight: 800; font-size: 1.2rem; letter-spacing: 2px; }
+        .promo-visual { font-size: 10rem; position: relative; z-index: 2; }
+        .promo-bg-circle { position: absolute; right: -100px; top: -100px; width: 500px; height: 500px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+
+        /* TESTIMONIOS */
+        .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+        .testimonial-card { background: white; border-radius: 20px; padding: 2rem; border: 1px solid #eee; transition: var(--transicion); }
+        .testimonial-card:hover { box-shadow: var(--sombra); }
+        .testimonial-stars { color: var(--naranja); font-size: 1.1rem; margin-bottom: 1rem; }
+        .testimonial-text { color: var(--gris); font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.5rem; font-style: italic; }
+        .testimonial-author { display: flex; align-items: center; gap: 1rem; }
+        .testimonial-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--gris-claro); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .testimonial-name h4 { font-size: 1rem; font-weight: 700; color: var(--oscuro); }
+        .testimonial-name p { font-size: 0.8rem; color: var(--gris); }
+
+        /* FOOTER */
+        .footer { background: var(--oscuro); color: white; padding: 5rem 2rem 2rem; }
+        .footer-container { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+        .footer-brand p { color: rgba(255,255,255,0.5); margin-top: 1rem; line-height: 1.7; max-width: 300px; }
+        .footer-socials { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .footer-social { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transicion); color: white; text-decoration: none; font-weight: bold; }
+        .footer-social:hover { background: var(--primario); }
+        .footer-col h3 { font-size: 1.1rem; margin-bottom: 1.5rem; }
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 0.8rem; }
+        .footer-col a { color: rgba(255,255,255,0.5); text-decoration: none; transition: var(--transicion); font-size: 0.95rem; }
+        .footer-col a:hover { color: var(--naranja); }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.85rem; max-width: 1300px; margin: 0 auto; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .hero-container { grid-template-columns: 1fr; text-align: center; }
+            .hero-desc { margin: 0 auto 2rem; }
+            .hero-btns { justify-content: center; }
+            .hero-stats { justify-content: center; }
+            .hero-visual { display: none; }
+            .testimonials-grid { grid-template-columns: 1fr; }
+            .footer-container { grid-template-columns: 1fr 1fr; }
+            .promo-section { flex-direction: column; text-align: center; }
+            .promo-visual { display: none; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero-title { font-size: 2.5rem; }
+            .section-title { font-size: 2rem; }
+            .footer-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a class="nav-logo">Sabor<span>Express</span></a>
+            <ul class="nav-links">
+                <li><a class="nav-link" href="#inicio">Inicio</a></li>
+                <li><a class="nav-link" href="#menu">Menú</a></li>
+                <li><a class="nav-link" href="#ofertas">Ofertas</a></li>
+                <li><a class="nav-link" href="#resenas">Reseñas</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="cart-btn">🛒 <span class="cart-count" id="cartCount">0</span></button>
+                <button class="nav-order-btn">Pedir ahora</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">🔥 Envío gratis en pedidos +$25</div>
+                <h1 class="hero-title">La mejor comida,<br /><span class="highlight">directo a tu puerta</span></h1>
+                <p class="hero-desc">Descubre sabores únicos preparados por chefs expertos. Rápido, fresco y delicioso en cada bocado.</p>
+                <div class="hero-btns">
+                    <button class="btn-primary">🛵 Ordenar ahora</button>
+                    <button class="btn-outline">📋 Ver menú</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat"><h3>30<span>min</span></h3><p>Tiempo de entrega</p></div>
+                    <div class="stat"><h3>4.9<span>⭐</span></h3><p>Calificación</p></div>
+                    <div class="stat"><h3>15k<span>+</span></h3><p>Clientes felices</p></div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-img-circle">🍔</div>
+                <div class="float-card top-right">
+                    <div class="float-icon">⭐</div>
+                    <div class="float-text"><h4>Top Rated</h4><p>+2000 reseñas</p></div>
+                </div>
+                <div class="float-card bottom-left">
+                    <div class="float-icon">🚀</div>
+                    <div class="float-text"><h4>Envío rápido</h4><p>30 min promedio</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section class="section categories-section">
+        <div class="section-container">
+            <div class="section-header">
+                <p class="section-sub">Explora</p>
+                <h2 class="section-title">¿Qué te apetece hoy?</h2>
+            </div>
+            <div class="categories-grid" id="categoriesGrid"></div>
+        </div>
+    </section>
+
+    <!-- MENU -->
+    <section class="section" id="menu">
+        <div class="section-container">
+            <div class="section-header">
+                <p class="section-sub">Nuestro menú</p>
+                <h2 class="section-title">Platos más populares</h2>
+                <p class="section-desc">Selecciona tus favoritos y ordénalos con un solo clic</p>
+            </div>
+            <div class="menu-grid" id="menuGrid"></div>
+        </div>
+    </section>
+
+    <!-- PROMO -->
+    <div class="section-container" id="ofertas">
+        <div class="promo-section">
+            <div class="promo-bg-circle"></div>
+            <div class="promo-content">
+                <h2>¡30% OFF en tu primer pedido!</h2>
+                <p>Usa el código de descuento al momento de pagar y disfruta de la mejor comida al mejor precio.</p>
+                <div class="promo-code">SABOR30</div>
+            </div>
+            <div class="promo-visual">🎉</div>
+        </div>
+    </div>
+
+    <!-- TESTIMONIOS -->
+    <section class="section" id="resenas">
+        <div class="section-container">
+            <div class="section-header">
+                <p class="section-sub">Reseñas</p>
+                <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"La mejor hamburguesa que he probado por delivery. Llegó caliente y súper rápida."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">👨</div>
+                        <div class="testimonial-name"><h4>Carlos M.</h4><p>Cliente frecuente</p></div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"El sushi es increíble, fresco y muy bien presentado. La página es fácil de usar."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">👩</div>
+                        <div class="testimonial-name"><h4>María L.</h4><p>Cliente nueva</p></div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"Pedí pizza para una reunión y todos quedaron encantados. Ingredientes de primera."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">👨‍💻</div>
+                        <div class="testimonial-name"><h4>Andrés R.</h4><p>Cliente frecuente</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h2 style="font-size:1.8rem; font-weight:800;">Sabor<span style="color:var(--naranja);">Express</span></h2>
+                <p>La mejor comida de la ciudad, entregada directamente en la puerta de tu casa.</p>
+                <div class="footer-socials">
+                    <a class="footer-social" href="#">f</a>
+                    <a class="footer-social" href="#">X</a>
+                    <a class="footer-social" href="#">in</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Menú</h3>
+                <ul>
+                    <li><a href="#">Hamburguesas</a></li>
+                    <li><a href="#">Pizzas</a></li>
+                    <li><a href="#">Sushi</a></li>
+                    <li><a href="#">Postres</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Compañía</h3>
+                <ul>
+                    <li><a href="#">Sobre nosotros</a></li>
+                    <li><a href="#">Contacto</a></li>
+                    <li><a href="#">Trabaja con nosotros</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Soporte</h3>
+                <ul>
+                    <li><a href="#">Centro de ayuda</a></li>
+                    <li><a href="#">Términos</a></li>
+                    <li><a href="#">Privacidad</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 SaborExpress. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Datos
+        const categorias = [
+            { id: 1, nombre: 'Todos', emoji: '🍽️' },
+            { id: 2, nombre: 'Hamburguesas', emoji: '🍔' },
+            { id: 3, nombre: 'Pizzas', emoji: '🍕' },
+            { id: 4, nombre: 'Sushi', emoji: '🍣' },
+            { id: 5, nombre: 'Ensaladas', emoji: '🥗' },
+            { id: 6, nombre: 'Postres', emoji: '🍰' },
+        ]
+
+        const menuItems = [
+            { id: 1, nombre: 'Smash Burger Doble', desc: 'Queso cheddar, cebolla caramelizada, salsa especial', precio: 10.99, tiempo: '20-30 min', rating: 4.9, pedidos: 124, emoji: '🍔', bg: '#FFEAEA', tag: 'Más vendido', categoria: 'Hamburguesas' },
+            { id: 2, nombre: 'Pizza Margherita', desc: 'Mozzarella fresca, albahaca, salsa pomodoro', precio: 14.50, tiempo: '30-45 min', rating: 4.8, pedidos: 98, emoji: '🍕', bg: '#FFF3E0', tag: null, categoria: 'Pizzas' },
+            { id: 3, nombre: 'Roll de Atún', desc: '12 piezas, salsa teriyaki, aguacate, sésamo', precio: 18.00, tiempo: '25-35 min', rating: 4.9, pedidos: 76, emoji: '🍣', bg: '#E8F5E9', tag: 'Premium', categoria: 'Sushi' },
+            { id: 4, nombre: 'Ensalada César', desc: 'Pollo grillé, parmesano, crutones, aderezo César', precio: 8.75, tiempo: '10-15 min', rating: 4.6, pedidos: 55, emoji: '🥗', bg: '#F1F8E9', tag: null, categoria: 'Ensaladas' },
+            { id: 5, nombre: 'Tiramisú Clásico', desc: 'Mascarpone, café espresso, cacao', precio: 6.50, tiempo: '5-10 min', rating: 4.9, pedidos: 112, emoji: '🍰', bg: '#FCE4EC', tag: 'Favorito', categoria: 'Postres' },
+            { id: 6, nombre: 'Hamburguesa BBQ', desc: 'Salsa BBQ ahumada, bacon, aros de cebolla', precio: 12.50, tiempo: '20-30 min', rating: 4.7, pedidos: 89, emoji: '🍔', bg: '#FFF8E1', tag: null, categoria: 'Hamburguesas' },
+            { id: 7, nombre: 'Pizza Pepperoni', desc: 'Doble pepperoni, mozzarella, orégano', precio: 15.00, tiempo: '30-45 min', rating: 4.8, pedidos: 150, emoji: '🍕', bg: '#FFEBEE', tag: 'Popular', categoria: 'Pizzas' },
+            { id: 8, nombre: 'Cheesecake de Fresa', desc: 'Base galleta, crema de queso, fresas frescas', precio: 7.00, tiempo: '5-10 min', rating: 4.7, pedidos: 64, emoji: '🍓', bg: '#FCE4EC', tag: null, categoria: 'Postres' },
+        ]
+
+        let cartCount = 0
+        let activeCategory = 'Todos'
+
+        // Render categorías
+        function renderCategorias() {
+            const grid = document.getElementById('categoriesGrid')
+            grid.innerHTML = categorias.map(cat => `
+                <div class="category-card ${activeCategory === cat.nombre ? 'active' : ''}" onclick="filterCategory('${cat.nombre}')">
+                    <span class="category-icon">${cat.emoji}</span>
+                    <span class="category-name">${cat.nombre}</span>
+                </div>
+            `).join('')
+        }
+
+        // Render menú
+        function renderMenu() {
+            const grid = document.getElementById('menuGrid')
+            const filtered = activeCategory === 'Todos' ? menuItems : menuItems.filter(i => i.categoria === activeCategory)
+            
+            grid.innerHTML = filtered.map(item => `
+                <div class="menu-card">
+                    <div class="menu-img" style="background:${item.bg}">
+                        ${item.tag ? `<span class="menu-tag">${item.tag}</span>` : ''}
+                        ${item.emoji}
+                    </div>
+                    <div class="menu-info">
+                        <div class="menu-info-top">
+                            <h3 class="menu-name">${item.nombre}</h3>
+                            <span class="menu-price">$${item.precio.toFixed(2)}</span>
+                        </div>
+                        <p class="menu-desc">${item.desc}</p>
+                        <div class="menu-meta">
+                            <div class="menu-rating">⭐ ${item.rating} <span>(${item.pedidos})</span></div>
+                            <div class="menu-time">🕐 ${item.tiempo}</div>
+                        </div>
+                        <button class="add-btn" onclick="addToCart()">+ Agregar al carrito</button>
+                    </div>
+                </div>
+            `).join('')
+        }
+
+        // Filtros
+        function filterCategory(nombre) {
+            activeCategory = nombre
+            renderCategorias()
+            renderMenu()
+        }
+
+        // Carrito
+        function addToCart() {
+            cartCount++
+            document.getElementById('cartCount').textContent = cartCount
+        }
+
+        // Navbar scroll
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50)
+        })
+
+        // Init
+        renderCategorias()
+        renderMenu()
+    </script>
+
+</body>
 </html>
